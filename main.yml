@@ -1,0 +1,34 @@
+name: Run JUnit Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Compile code
+        run: |
+          mkdir -p out
+          javac -cp "lib/*" -d out $(find . -name "*.java")
+
+      - name: Run tests
+        run: |
+          java -jar lib/junit-platform-console-standalone-1.10.0.jar \
+            --class-path out \
+            --scan-classpath \
+            --details-theme=ascii \
+            --reports-dir=reports
